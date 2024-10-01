@@ -1,63 +1,37 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'dart:async';
 
 import '../screens/signInScreen.dart';
 
-class OnBoardingPage extends StatefulWidget {
-  const OnBoardingPage({Key? key}) : super(key: key);
-
+class SplashScreen extends StatefulWidget {
   @override
-  OnBoardingPageState createState() => OnBoardingPageState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class OnBoardingPageState extends State<OnBoardingPage> {
-  final introKey = GlobalKey<IntroductionScreenState>();
-  static const bodyStyle = TextStyle(fontSize: 19.0);
-
-  void _onIntroEnd(context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const SignInScreen()),
-    );
-  }
-
-  static const pageDecoration = PageDecoration(
-    titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
-    bodyTextStyle: bodyStyle,
-    bodyPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-    pageColor: Colors.white,
-    imagePadding: EdgeInsets.zero,
-  );
+class _SplashScreenState extends State<SplashScreen> {
+  @override
   void initState() {
     super.initState();
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (BuildContext context) => buildIntroductionScreen(pageDecoration, context)),
+        MaterialPageRoute(builder: (_) => OnboardingScreen()),
       );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Container(
-        color: const Color(0xff6759FF),
-        child: const Center(
+        color: Color(0xff6759FF),
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.home,
-                size: 150,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Text(
+              Image.asset('images/home.png'),
+              const SizedBox(height: 20),
+              const Text(
                 'Home Services',
                 style: TextStyle(
                   fontSize: 24,
@@ -69,83 +43,235 @@ class OnBoardingPageState extends State<OnBoardingPage> {
           ),
         ),
       ),
-    );;
+    );
+  }
+}
+
+class OnboardingScreen extends StatefulWidget {
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final introKey = GlobalKey<IntroductionScreenState>();
+  int currentPageIndex = 0;
+
+  void _onIntroEnd(context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => SignInScreen()),
+    );
   }
 
-  IntroductionScreen buildIntroductionScreen(
-      PageDecoration pageDecoration, BuildContext context) {
-    return IntroductionScreen(
-      key: introKey,
-      globalBackgroundColor: Colors.white,
-      allowImplicitScrolling: true,
-      autoScrollDuration: 3000,
-      infiniteAutoScroll: true,
-      globalHeader: const Align(
-        alignment: Alignment.topRight,
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(top: 16, right: 16),
+  Widget _buildImage(String assetName, [double width = 350]) {
+    return Image.asset('$assetName', width: width);
+  }
+
+  Widget _buildTitle(String text, {String? highlight}) {
+    if (highlight != null && text.contains(highlight)) {
+      List<String> parts = text.split(highlight);
+      return RichText(
+        text: TextSpan(
+          style: const TextStyle(
+              fontSize: 28.0, fontWeight: FontWeight.w700, color: Colors.black),
+          children: [
+            TextSpan(text: parts[0]),
+            TextSpan(
+              text: highlight,
+              style: const TextStyle(color: Color(0xff6759FF)),
+            ),
+            TextSpan(text: parts.length > 1 ? parts[1] : ''),
+          ],
+        ),
+      );
+    }
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 28.0,
+        fontWeight: FontWeight.w700,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const pageDecoration = PageDecoration(
+      titleTextStyle: TextStyle(
+          fontSize: 28.0, fontWeight: FontWeight.w700, color: Colors.black),
+      bodyTextStyle: TextStyle(fontSize: 16.0, color: Colors.grey),
+      bodyPadding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      imagePadding:
+      EdgeInsets.only(top: 50.0,bottom: 0),
+      imageAlignment: Alignment.center,
+      pageColor: Colors.white,
+    );
+
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30),
+          child: Stack(
+            children: [
+              IntroductionScreen(
+                key: introKey,
+                globalBackgroundColor: Colors.white,
+                pages: [
+                  PageViewModel(
+                    titleWidget: _buildTitle(
+                      "  Comprehensive Home\n Services at Your Doorstep",
+                      highlight: " Your Doorstep",
+                    ), // Highlighted text
+                    body:
+                    "Whether it's cleaning, maintenance, or repairs, our Home Services Program brings skilled professionals directly to your home.",
+                    image: _buildImage('images/2.png'),
+                    decoration: pageDecoration,
+                  ),
+                  PageViewModel(
+                    titleWidget: _buildTitle("Expert Solutions \n for Your Home",
+                        highlight: "Expert Solutions"), // Highlighted text
+                    body:
+                    "From appliance repairs to deep cleaning, we cover all aspects of home care.",
+                    image: _buildImage('images/3.png'),
+                    decoration: pageDecoration,
+                  ),
+                  PageViewModel(
+                    titleWidget: _buildTitle("Your Home,\n Our Priority",
+                        highlight: "Our Priority"),
+                    // Highlighted text
+                    body:
+                    "Experience hassle-free home services with our trusted network of professionals.",
+                    image: _buildImage('images/4.png'),
+                    decoration: pageDecoration,
+                  ),
+                ],
+
+                onDone: () => _onIntroEnd(context),
+                showSkipButton: false,
+                showNextButton: false,
+                done: GestureDetector(
+                  onTap: () => _onIntroEnd(context),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue.withOpacity(0.1),
+                      border: Border.all(color: const Color(0xff6759FF), width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      color: Color(0xff6759FF),
+                      size: 30,
+                    ),
+                  ),
+                ),
+
+                dotsDecorator: const DotsDecorator(
+                  size: Size(10.0, 10.0),
+                  color: Colors.grey,
+                  activeSize: Size(22.0, 10.0),
+                  activeColor: Color(0xff6759FF),
+                  activeShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  ),
+                ),
+                onChange: (index) {
+                  setState(() {
+                    currentPageIndex = index;
+                  });
+                },
+              ),
+              // Skip button in the top-right corner
+              Positioned(
+                top: 40, // Adjust to your UI needs
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => _onIntroEnd(context), // Skip functionality
+                  child: const Text(
+                    'Skip',
+                    style: TextStyle(
+                      color: Color(0xff6759FF),
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+              // Back arrow with circular button, visible only after the 1st page
+              if (currentPageIndex > 0)
+                Positioned(
+                  bottom: 25,
+                  left: 44,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (introKey.currentState != null) {
+                        introKey.currentState!.previous();
+                      }
+                    },
+                    child: Container(
+                      width: 50, // Adjust size
+                      height: 50,
+
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue.withOpacity(0.1), // Circle background
+                        border: Border.all(color: Color(0xff6759FF), width: 2),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Color(0xff6759FF),
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
+              // Next arrow with circular button, visible unless on the last page
+              if (currentPageIndex < 2)
+                Positioned(
+                  bottom: 25,
+                  right: 44,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (introKey.currentState != null) {
+                        introKey.currentState!.next();
+                      }
+                    },
+
+                    child: Container(
+                      width: 50, // Adjust size
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xff6759FF)
+                            .withOpacity(0.1), // Circle background
+                        border: Border.all(color: const Color(0xff6759FF), width: 2),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward,
+                        color: Color(0xff6759FF),
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
+
+            ],
           ),
         ),
       ),
+    );
+  }
+}
 
-      pages: [
-        PageViewModel(
-          title: "Comprehensive Home Services at Your \n Doorstep",
-          body:
-              "Whether it\'s cleaning, maintenance, or repairs, our Home Services Program brings skilled professionals directly to your home",
-          image: Image.asset('images/2.png'),
-
-          decoration: pageDecoration,
-        ),
-        PageViewModel(
-          title: "Expert Solutions \n for Your Home",
-          body:
-              "From appliance repairs to deep cleaning, we cover all aspects of home care.",
-          image: Image.asset('images/3.png'),
-          decoration: pageDecoration.copyWith(
-            bodyFlex: 6,
-            imageFlex: 6,
-            safeArea: 80,
-          ),
-        ),
-        PageViewModel(
-          title: "Your Home, Our \n Priority",
-          body:
-              "Experience hassle-free home services with our trusted network of professionals..",
-          image: Image.asset('images/4.png'),
-          decoration: pageDecoration,
-
-        ),
-      ],
-      onDone: () => _onIntroEnd(context),
-      onSkip: () => _onIntroEnd(context), // You can override onSkip callback
-      showSkipButton: true,
-      skipOrBackFlex: 0,
-      nextFlex: 0,
-      showBackButton: false,
-      back: const Icon(Icons.arrow_back),
-      skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
-      next: const Icon(Icons.arrow_forward),
-      done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
-      curve: Curves.fastLinearToSlowEaseIn,
-      controlsMargin: const EdgeInsets.all(16),
-      controlsPadding: kIsWeb
-          ? const EdgeInsets.all(12.0)
-          : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      dotsDecorator: const DotsDecorator(
-        size: Size(10.0, 10.0),
-        color: Color(0xFFBDBDBD),
-        activeSize: Size(22.0, 10.0),
-        activeShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(25.0)),
-        ),
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(""),
       ),
-      dotsContainerDecorator: const ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-        ),
+      body: Center(
+        child: Text(""),
       ),
     );
   }
