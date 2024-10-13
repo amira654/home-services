@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'features/auth/OnBording/intro_screen.dart';
 import 'features/auth/screens/complete_reg.dart';
 
 import 'features/auth/screens/signUpScreen.dart';
 import 'features/auth/screens/signInScreen.dart';
+import 'features/auth/screens/splash_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();

@@ -18,7 +18,13 @@ class _OTPScreenState extends State<OTPScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 100.0,
+            left: 24.0,
+            bottom: 24.0,
+            right: 24.0,
+          ),
           child: Column(
             children: [
               const Text(
@@ -31,24 +37,23 @@ class _OTPScreenState extends State<OTPScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "We need to register your phone number by using a one-time OTP code verification.",
+                  "Please enter the code we just sent.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400, color: Colors.grey,
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextField(
-                  controller: otpController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "+207123456789",
-                    labelText: "Enter the Phone Number",
-                  ),
+              ),SizedBox(height: 55,),
+              TextField(
+                style: const TextStyle(fontSize: 10),
+                controller: otpController,
+                keyboardType: TextInputType.phone,
+                
+                obscureText: false,
+                decoration: InputDecoration(
+                  labelText: "Enter OTP code",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -82,7 +87,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     });
                   },
                   child: const Text(
-                    "Send Code",
+                    "Verify",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
